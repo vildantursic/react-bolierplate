@@ -18,7 +18,7 @@ class Map extends React.Component {
   }
 
   componentDidMount() {
-    requestJson('./data.geojson', (error, response) => {
+    requestJson('https://raw.githubusercontent.com/uber/react-map-gl/master/examples/data/us-income.geojson', (error, response) => {
       console.log(response);
       if (!error) {
         this.loadData(response);
