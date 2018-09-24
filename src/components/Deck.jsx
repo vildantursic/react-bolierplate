@@ -32,26 +32,24 @@ const polyLayer = new PolygonLayer({
 });
 
 // DeckGL react component
-class Deck extends React.Component {
-  render() {
-    const { viewportData, setNewViewport } = { ...this.props };
+const Deck = (props) => {
+  const { viewportData, setNewViewport } = { ...props };
 
-    return (
-      <DeckGL viewState={viewportData} layers={[polyLayer]} controller={true}>
-        <LineLayer id="line-layer" data={data} />
-        <MapView id="map">
-          <InteractiveMap
-            mapStyle="mapbox://styles/mapbox/dark-v9"
-            {...viewportData}
-            mapboxApiAccessToken={config.mapboxToken}
-            onViewportChange={viewport => setNewViewport(viewport)}
-          />
-        </MapView>
+  return (
+    <DeckGL viewState={viewportData} layers={[polyLayer]} controller>
+      <LineLayer id="line-layer" data={data} />
+      <MapView id="map">
+        <InteractiveMap
+          mapStyle="mapbox://styles/mapbox/dark-v9"
+          {...viewportData}
+          mapboxApiAccessToken={config.mapboxToken}
+          onViewportChange={viewport => setNewViewport(viewport)}
+        />
+      </MapView>
 
-        <FirstPersonView width="50%" x="50%" fovy={50} />
-      </DeckGL>
-    );
-  }
-}
+      <FirstPersonView width="50%" x="50%" fovy={50} />
+    </DeckGL>
+  );
+};
 
 export default Deck;

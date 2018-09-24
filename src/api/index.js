@@ -6,3 +6,11 @@ export const map = {
     return res.data;
   },
 };
+
+export const user = {
+  async getUser() {
+    // TODO change mocked api call
+    const res = await axios.get('https://example.com/user');
+    return res.data;
+  },
+};

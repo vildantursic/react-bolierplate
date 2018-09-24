@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactMapGL, { experimental } from 'react-map-gl';
 import config from '../config';
-import { defaultMapStyle, highlightLayerIndex } from './mapStyle';
+import { defaultMapStyle } from './mapStyle';
 
 class MyMapControls extends experimental.MapControls {
   _onDoubleTap() {
