@@ -4,7 +4,7 @@ import MAP_STYLE from './basic.json';
 // For more information on data-driven styles, see https://www.mapbox.com/help/gl-dds-ref/
 export const dataLayer = fromJS({
   id: 'data',
-  source: 'incomeByState',
+  source: 'us-income',
   type: 'fill',
   interactive: true,
   paint: {

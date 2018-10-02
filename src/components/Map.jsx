@@ -2,24 +2,27 @@ import React from 'react';
 import MapGL from 'react-map-gl';
 import { fromJS } from 'immutable';
 import { json as requestJson } from 'd3-request';
+import updatePercentiles from './utils';
+import ControlPanel from './ControlPanel';
 
 import config from '../config';
 
 import { dataLayer, defaultMapStyle } from './mapStyle';
-import updatePercentiles from './utils';
-import ControlPanel from './ControlPanel';
 
 class Map extends React.Component {
   state = {
-    mapStyle: defaultMapStyle,
-    year: 2015,
     data: null,
+    year: 2015,
+    mapStyle: defaultMapStyle,
     hoveredFeature: null,
   }
 
   componentDidMount() {
-    requestJson('https://raw.githubusercontent.com/uber/react-map-gl/master/examples/data/us-income.geojson', (error, response) => {
-      console.log(response);
+
+  }
+
+  newData = (url) => {
+    requestJson(url, (error, response) => {
       if (!error) {
         this.loadData(response);
       }
@@ -27,13 +30,11 @@ class Map extends React.Component {
   }
 
   loadData = (data) => {
-    const { year } = this.state;
-
-    updatePercentiles(data, f => f.properties.income[year]);
+    updatePercentiles(data, f => f.properties.income[this.state.year]);
 
     const mapStyle = defaultMapStyle
       // Add geojson source to map
-      .setIn(['sources', 'incomeByState'], fromJS({ type: 'geojson', data }))
+      .setIn(['sources', 'us-income'], fromJS({ type: 'geojson', data }))
       // Add point layer to map
       .set('layers', defaultMapStyle.get('layers').push(dataLayer));
 
@@ -47,7 +48,7 @@ class Map extends React.Component {
       const { data, mapStyle } = this.state;
       if (data) {
         updatePercentiles(data, f => f.properties.income[value]);
-        const newMapStyle = mapStyle.setIn(['sources', 'incomeByState', 'data'], fromJS(data));
+        const newMapStyle = mapStyle.setIn(['sources', 'us-income', 'data'], fromJS(data));
         this.setState({ mapStyle: newMapStyle });
       }
     }
@@ -70,15 +71,11 @@ class Map extends React.Component {
     return hoveredFeature && (
       <div className="tooltip" style={{ left: x, top: y }}>
         <div>
-          State:
+          Props:
           { hoveredFeature.properties.name }
-        </div>
-        <div>
-          Median Household Income:
+          <br />
           { hoveredFeature.properties.value }
-        </div>
-        <div>
-          Percentile:
+          <br />
           { hoveredFeature.properties.percentile / 8 * 100 }
         </div>
       </div>
@@ -86,7 +83,11 @@ class Map extends React.Component {
   }
 
   render() {
-    const { viewportData, setNewViewport, containerComponent } = this.props;
+    const {
+      viewportData, settings,
+      setNewViewport,
+      containerComponent,
+    } = this.props;
     const { mapStyle } = this.state;
 
     return (
@@ -94,17 +95,18 @@ class Map extends React.Component {
         <MapGL
           mapboxApiAccessToken={config.mapboxToken}
           {...viewportData}
+          {...settings}
           mapStyle={mapStyle}
           onHover={this.onHover}
           onViewportChange={viewport => setNewViewport(viewport)}
         >
           { this.renderTooltip() }
         </MapGL>
-
         <ControlPanel
           containerComponent={containerComponent}
           settings={this.state}
           onChange={this.updateSettings}
+          loadNewData={this.newData}
         />
       </div>
     );

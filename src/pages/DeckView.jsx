@@ -37,7 +37,10 @@ class DeckView extends React.Component {
       <div>
         <Deck
           viewportData={viewportData}
-          setNewViewport={newViewport => this.setState({ viewportData: newViewport })}
+          setNewViewport={(newViewport) => {
+            console.log(newViewport);
+            this.setState({ viewportData: newViewport });
+          }}
         />
       </div>
     );

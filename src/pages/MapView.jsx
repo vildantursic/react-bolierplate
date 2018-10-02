@@ -45,6 +45,7 @@ class MapView extends React.Component {
 
 const mapState = state => ({
   options: state.map.options,
+  settings: state.map.settings,
   layer: state.map.layer,
 });
 
