@@ -6,7 +6,7 @@ import { Drawer, Button, List } from 'antd';
 import store from './store/index';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
-import './assets/styles/App.scss';
+import './assets/styles/App.css';
 
 import MapView from './pages/MapView';
 import DeckView from './pages/DeckView';
@@ -55,9 +55,13 @@ class App extends Component {
                 />
               </Drawer>
               <div>
-                <Button style={{ position: 'absolute', zIndex: '100' }} type="primary" onClick={this.showDrawer}>
-                  Open
-                </Button>
+                <Button
+                  className="menu-button"
+                  type="primary"
+                  shape="circle"
+                  icon="setting"
+                  onClick={this.showDrawer}
+                />
                 <Route exact path="/" component={MapView} />
                 <Route exact path="/deck" component={DeckView} />
               </div>

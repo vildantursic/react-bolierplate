@@ -6,9 +6,9 @@ export default {
     options: {
       longitude: -122.41669,
       latitude: 37.7853,
-      zoom: 10,
-      pitch: 50,
-      bearing: 20,
+      zoom: 5,
+      pitch: 0,
+      bearing: 0,
     },
   },
   reducers: {

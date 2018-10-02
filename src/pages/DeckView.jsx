@@ -18,11 +18,14 @@ class DeckView extends React.Component {
   }
 
   resize = () => {
+    const { viewportData, width, height } = { ...this.state, ...this.props };
+
     this.setState({
+
       viewportData: {
-        ...this.state.viewportData,
-        width: this.props.width || window.innerWidth,
-        height: this.props.height || window.innerHeight,
+        ...viewportData,
+        width: width || window.innerWidth,
+        height: height || window.innerHeight,
       },
     });
   };
@@ -34,7 +37,10 @@ class DeckView extends React.Component {
       <div>
         <Deck
           viewportData={viewportData}
-          setNewViewport={newViewport => this.setState({ viewportData: newViewport })}
+          setNewViewport={(newViewport) => {
+            console.log(newViewport);
+            this.setState({ viewportData: newViewport });
+          }}
         />
       </div>
     );

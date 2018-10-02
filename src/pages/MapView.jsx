@@ -18,11 +18,13 @@ class MapView extends React.Component {
   }
 
   resize = () => {
+    const { viewportData, width, height } = { ...this.state, ...this.props };
+
     this.setState({
       viewportData: {
-        ...this.state.viewportData,
-        width: this.props.width || window.innerWidth,
-        height: this.props.height || window.innerHeight,
+        ...viewportData,
+        width: width || window.innerWidth,
+        height: height || window.innerHeight,
       },
     });
   };
@@ -43,6 +45,7 @@ class MapView extends React.Component {
 
 const mapState = state => ({
   options: state.map.options,
+  settings: state.map.settings,
   layer: state.map.layer,
 });
 
