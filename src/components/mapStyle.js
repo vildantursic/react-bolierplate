@@ -1,44 +1,29 @@
 import { fromJS } from 'immutable';
 import MAP_STYLE from './basic.json';
 
-// Add the vector tile source for counties
-Object.assign(MAP_STYLE.sources, {
-  counties: {
-    type: 'vector',
-    url: 'mapbox://mapbox.82pkq93d',
+// For more information on data-driven styles, see https://www.mapbox.com/help/gl-dds-ref/
+export const dataLayer = fromJS({
+  id: 'data',
+  source: 'us-income',
+  type: 'fill',
+  interactive: true,
+  paint: {
+    'fill-color': {
+      property: 'percentile',
+      stops: [
+        [0, '#3288bd'],
+        [1, '#66c2a5'],
+        [2, '#abdda4'],
+        [3, '#e6f598'],
+        [4, '#ffffbf'],
+        [5, '#fee08b'],
+        [6, '#fdae61'],
+        [7, '#f46d43'],
+        [8, '#d53e4f'],
+      ],
+    },
+    'fill-opacity': 0.8,
   },
 });
-
-// Insert custom layers before city labels
-MAP_STYLE.layers.splice(
-  MAP_STYLE.layers.findIndex(layer => layer.id === 'place_label_city'), 0,
-  // Counties polygons
-  {
-    id: 'counties',
-    interactive: true,
-    type: 'fill',
-    source: 'counties',
-    'source-layer': 'original',
-    paint: {
-      'fill-outline-color': 'rgba(0,0,0,0.1)',
-      'fill-color': 'rgba(0,0,0,0.1)',
-    },
-  },
-  // Highlighted county polygons
-  {
-    id: 'counties-highlighted',
-    type: 'fill',
-    source: 'counties',
-    'source-layer': 'original',
-    paint: {
-      'fill-outline-color': '#484896',
-      'fill-color': '#6e599f',
-      'fill-opacity': 0.75,
-    },
-    filter: ['in', 'COUNTY', ''],
-  },
-);
-
-export const highlightLayerIndex = MAP_STYLE.layers.findIndex(layer => layer.id === 'counties-highlighted');
 
 export const defaultMapStyle = fromJS(MAP_STYLE);

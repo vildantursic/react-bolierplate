@@ -1,12 +1,20 @@
 import React from 'react';
 import DeckGL, {
-  LineLayer, PolygonLayer, FirstPersonView, MapView,
+  PolygonLayer, MapView,
 } from 'deck.gl';
-import { InteractiveMap } from 'react-map-gl';
+import MapGL from 'react-map-gl';
+
+import { fromJS } from 'immutable';
+import { json as requestJson } from 'd3-request';
+
 import config from '../config';
 
+import updatePercentiles from './utils';
+import ControlPanel from './ControlPanel';
+
+import { dataLayer, defaultMapStyle } from './mapStyle';
+
 // Data to be used by the LineLayer
-const data = [{ sourcePosition: [-122.41669, 37.8853], targetPosition: [-122.41669, 37.781] }];
 const polygonData = [
   {
     contour: [
@@ -17,7 +25,7 @@ const polygonData = [
     area: 6.11,
   },
 ];
-const polyLayer = new PolygonLayer({
+const layers = [new PolygonLayer({
   data: polygonData,
   pickable: true,
   stroked: true,
@@ -29,27 +37,84 @@ const polyLayer = new PolygonLayer({
   getFillColor: d => [d.population / d.area / 60, 140, 0],
   getLineColor: [80, 80, 80],
   getLineWidth: 1,
-});
+})];
 
 // DeckGL react component
 class Deck extends React.Component {
+  state = {
+    data: null,
+    year: 2015,
+    mapStyle: defaultMapStyle,
+    hoveredFeature: null,
+  }
+
+  componentDidMount() {
+    this.newData('https://raw.githubusercontent.com/uber/react-map-gl/master/examples/data/us-income.geojson');
+  }
+
+  newData = (url) => {
+    requestJson(url, (error, response) => {
+      if (!error) {
+        this.loadData(response);
+      }
+    });
+  }
+
+  loadData = (data) => {
+    updatePercentiles(data, f => f.properties.income[this.state.year]);
+
+    const mapStyle = defaultMapStyle
+      // Add geojson source to map
+      .setIn(['sources', 'us-income'], fromJS({ type: 'geojson', data }))
+      // Add point layer to map
+      .set('layers', defaultMapStyle.get('layers').push(dataLayer));
+
+    console.log(mapStyle);
+    this.setState({ data, mapStyle });
+  };
+
+  updateSettings = (name, value) => {
+    if (name === 'year') {
+      this.setState({ year: value });
+
+      const { data, mapStyle } = this.state;
+      if (data) {
+        updatePercentiles(data, f => f.properties.income[value]);
+        const newMapStyle = mapStyle.setIn(['sources', 'us-income', 'data'], fromJS(data));
+        this.setState({ mapStyle: newMapStyle });
+      }
+    }
+  };
+
   render() {
-    const { viewportData, setNewViewport } = { ...this.props };
+    const { viewportData, setNewViewport, controller = true, baseMap = true, containerComponent } = { ...this.props };
+    const { mapStyle } = { ...this.state };
 
     return (
-      <DeckGL viewState={viewportData} layers={[polyLayer]} controller={true}>
-        <LineLayer id="line-layer" data={data} />
-        <MapView id="map">
-          <InteractiveMap
-            mapStyle="mapbox://styles/mapbox/dark-v9"
-            {...viewportData}
-            mapboxApiAccessToken={config.mapboxToken}
-            onViewportChange={viewport => setNewViewport(viewport)}
-          />
-        </MapView>
-
-        <FirstPersonView width="50%" x="50%" fovy={50} />
-      </DeckGL>
+      <div>
+        <DeckGL
+          viewState={viewportData}
+          initialViewState={viewportData}
+          layers={layers}
+          controller={controller}
+        >
+          {baseMap && (
+            <MapGL
+              mapStyle={mapStyle}
+              reuseMaps
+              preventStyleDiffing={true}
+              {...viewportData}
+              mapboxApiAccessToken={config.mapboxToken}
+            />
+          )}
+        </DeckGL>
+        <ControlPanel
+          containerComponent={containerComponent}
+          settings={this.state}
+          onChange={this.updateSettings}
+          loadNewData={this.newData}
+        />
+      </div>
     );
   }
 }

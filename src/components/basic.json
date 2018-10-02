@@ -6,9 +6,14 @@
   },
   "sources": {
     "mapbox": {
-      "url": "mapbox://mapbox.mapbox-streets-v7",
+      "url": "mapbox://mapbox.mapbox-streets-v8",
       "type": "vector"
     }
+  },
+  "light": {
+    "anchor": "viewport",
+    "color": "white",
+    "intensity": 0.1
   },
   "sprite": "mapbox://sprites/mapbox/basic-v8",
   "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
